@@ -306,6 +306,15 @@ Find-DomainShare -ExcludeStandard -ExcludePrint -ExcludeIPC -CheckShareAccess
 
 - **With PowerView:**
 ```powershell
+# Retrieve the list of GPOs present in the current domain
+Get-NetGPO | select displayname
+# Enumerate Default Domain Policy
+Get-GPO -Name "Default Domain Policy"
+# Check permissions of current user over Default Domain Policy GPO
+Get-GPPermission -Guid 31b2f340-016d-11d2-945f-00c04fb984f9 -TargetType User -TargetName <user>  # Attack vector: GPOEditDeleteModifySecurity
+```
+
+```powershell
 # Get the organizational units in a domain
 Get-NetOU
 # Get the organizational units in a domain with name
