@@ -314,9 +314,15 @@ Get-NetGPO -Name "Default Domain Policy"
 $gpo = Get-NetGPO -Name "Default Domain Policy"
 $me = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 $sids = $me.Groups.Value + $me.User.Value
+
 Get-ObjectAcl -ResolveGUIDs -DistinguishedName $gpo.distinguishedname |
 ? { $sids -contains "$($_.SecurityIdentifier)" } |
-? { $_.ActiveDirectoryRights -match "GenericAll|GenericWrite|WriteDacl|WriteOwner|WriteProperty|CreateChild|DeleteChild" }
+? { $_.ActiveDirectoryRights -match "GenericAll|GenericWrite|WriteDacl|WriteOwner|WriteProperty|CreateChild|DeleteChild" } |
+select @{n="Identity";e={Convert-SidToName $_.SecurityIdentifier}},
+       ActiveDirectoryRights,
+       ObjectAceType,
+       AceType,
+       IsInherited
 --> si no devuelve nada, el usuario no tiene permisos suficientes como para abusar de la GPO.
 
 # If GPO has GPOEditDeleteModifySecurity --> add user to Local Administrator group
