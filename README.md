@@ -309,7 +309,7 @@ Find-DomainShare -ExcludeStandard -ExcludePrint -ExcludeIPC -CheckShareAccess
 # Retrieve the list of GPOs present in the current domain
 Get-NetGPO | select displayname
 # Enumerate Default Domain Policy
-Get-GPO -Name "Default Domain Policy"
+Get-NetGPO -Name "Default Domain Policy"
 # Check permissions of current user over Default Domain Policy GPO
 Get-GPPermission -Guid 31b2f340-016d-11d2-945f-00c04fb984f9 -TargetType User -TargetName <user>
 # If GPO has GPOEditDeleteModifySecurity --> add user to Local Administrator group
